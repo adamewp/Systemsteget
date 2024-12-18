@@ -1,0 +1,7 @@
+{
+    "name": "uppsala/step-challenge",
+    "description": "Uppsala Systemvetare Step Challenge",
+    "require": {
+        "google/apiclient": "^2.0"
+    }
+}

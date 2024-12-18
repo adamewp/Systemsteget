@@ -1,0 +1,19 @@
+<?php
+// Database configuration
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'step_challenge');
+define('DB_USER', 'your_database_user');
+define('DB_PASS', 'your_database_password');
+
+// Google OAuth configuration
+$google_client_id = 'your_google_client_id';
+$google_client_secret = 'your_google_client_secret';
+
+// Application settings
+define('APP_URL', 'http://localhost');
+define('APP_NAME', 'Uppsala Systemvetare Step Challenge');
+
+// Error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ 
