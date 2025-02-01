@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        ".validate": "newData.hasChildren(['name', 'email'])",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "email": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$/)" },
+        "created_at": { ".validate": "newData.isNumber()" }
+      }
+    },
+    "steps": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid == $uid",
+        "$date": {
+          ".validate": "newData.hasChildren(['step_count', 'updated_at'])",
+          "step_count": { 
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
+          },
+          "updated_at": { 
+            ".validate": "newData.isNumber() && newData.val() <= (now + 60000) && newData.val() >= (now - 60000)"
+          }
+        }
+      }
+    }
+  }
+} 

@@ -1,44 +1,58 @@
 <?php
-require_once 'config.php';
+require_once __DIR__ . '/config/firebase_config.php';
 
-try {
-    $pdo = new PDO(
-        "mysql:host=" . DB_HOST,
-        DB_USER,
-        DB_PASS
-    );
+function getDatabase() {
+    static $database = null;
     
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    if ($database === null) {
+        $database = getFirebaseInstance();
+    }
     
-    // Create database if it doesn't exist
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS " . DB_NAME);
-    $pdo->exec("USE " . DB_NAME);
+    return $database;
+}
+
+// Helper functions for common database operations
+function saveUser($userData) {
+    $db = getDatabase();
+    $usersRef = $db->getReference('users');
     
-    // Create users table
-    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        google_id VARCHAR(255) UNIQUE NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        profile_picture VARCHAR(255),
-        access_token TEXT,
-        refresh_token TEXT,
-        token_expiry DATETIME,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
+    // Use Google ID as the key for the user
+    $userRef = $usersRef->getChild($userData['google_id']);
+    $userRef->set([
+        'name' => $userData['name'],
+        'email' => $userData['email'],
+        'created_at' => time()
+    ]);
     
-    // Create steps table
-    $pdo->exec("CREATE TABLE IF NOT EXISTS steps (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
-        step_count INT NOT NULL,
-        date DATE NOT NULL,
-        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        UNIQUE KEY unique_user_date (user_id, date)
-    )");
+    return $userData['google_id'];
+}
+
+function saveSteps($userId, $date, $stepCount) {
+    $db = getDatabase();
+    $stepsRef = $db->getReference('steps');
     
-    echo "Database and tables created successfully!";
-} catch(PDOException $e) {
-    die("Database initialization failed: " . $e->getMessage());
+    // Format: steps/userId/YYYY-MM-DD
+    $dateKey = date('Y-m-d', strtotime($date));
+    $stepRef = $stepsRef->getChild($userId)->getChild($dateKey);
+    
+    return $stepRef->set([
+        'step_count' => $stepCount,
+        'updated_at' => time()
+    ]);
+}
+
+function getSteps($userId, $startDate = null, $endDate = null) {
+    $db = getDatabase();
+    $stepsRef = $db->getReference('steps')->getChild($userId);
+    
+    if ($startDate && $endDate) {
+        // Firebase Realtime Database allows filtering by key
+        return $stepsRef
+            ->orderByKey()
+            ->startAt($startDate)
+            ->endAt($endDate)
+            ->getValue();
+    }
+    
+    return $stepsRef->getValue();
 } 

@@ -1,11 +1,25 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
 # Configuration files with sensitive data
-config.php
+/config/firebase-credentials.json
+/config/*.json
+!/config/*.example.json
 
 # Vendor directory
 /vendor/
+node_modules/
 
 # Composer files
 composer.phar
+composer.lock
+
+# Cache and logs
+/logs/
+/cache/
+*.log
 
 # IDE specific files
 .idea/
@@ -20,4 +34,9 @@ composer.phar
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak 
