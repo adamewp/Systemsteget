@@ -127,7 +127,3 @@ Detta projekt underhålls internt av IT-sektionen på Uppsala Systemvetare. Kont
 - Commita aldrig `config.php` med riktiga uppgifter
 - Håll Google OAuth-uppgifter säkra
 - Regelbundna säkerhetsuppdateringar rekommenderas
-
-## Kontakt
-
-För support eller frågor, använd kontaktformuläret i applikationen eller kontakta IT-sektionen direkt.
