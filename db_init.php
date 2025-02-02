@@ -35,10 +35,12 @@ function saveSteps($userId, $date, $stepCount) {
     $dateKey = date('Y-m-d', strtotime($date));
     $stepRef = $stepsRef->getChild($userId)->getChild($dateKey);
     
-    return $stepRef->set([
+    $stepRef->set([
         'step_count' => $stepCount,
         'updated_at' => time()
     ]);
+    
+    return $stepRef->getValue();
 }
 
 function getSteps($userId, $startDate = null, $endDate = null) {
@@ -55,4 +57,4 @@ function getSteps($userId, $startDate = null, $endDate = null) {
     }
     
     return $stepsRef->getValue();
-} 
+}
