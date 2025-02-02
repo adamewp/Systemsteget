@@ -82,8 +82,9 @@ class GoogleFitAPI {
                 'google_id' => $google_user->id
             ]);
 
-            // Store user ID in session for later use
+            // Store user ID and name in session for later use
             $_SESSION['user_id'] = $google_user->id; // Store the Google ID directly
+            $_SESSION['user_name'] = $google_user->name; // Store the user's name without encoding
             error_log("User ID stored in session: " . $_SESSION['user_id']);
         } catch (Exception $e) {
             error_log("Error saving user info: " . $e->getMessage());
@@ -109,6 +110,16 @@ class GoogleFitAPI {
         // If no data, return an empty array
         if ($leaderboardData === null) {
             return [];
+        }
+
+        // Sort leaderboard data by total steps
+        usort($leaderboardData, function($a, $b) {
+            return $b['total_steps'] <=> $a['total_steps'];
+        });
+
+        // Assign ranks
+        foreach ($leaderboardData as $index => &$entry) {
+            $entry['rank'] = $index + 1; // Rank starts from 1
         }
 
         return $leaderboardData;

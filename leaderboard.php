@@ -118,20 +118,8 @@
                             
                             $leaderboardData = $googleFit->getLeaderboard();
                             
-                            if (empty($leaderboardData)) {
-                                echo "<tr><td colspan='3' class='no-data'>Inga deltagare än. Bli först att gå med!</td></tr>";
-                            } else {
-                                foreach ($leaderboardData as $entry) {
-                                    echo "<tr>";
-                                    echo "<td>" . ($entry['rank'] ?? '-') . "</td>";
-                                    echo "<td>" . htmlspecialchars($entry['name']) . "</td>";
-                                    echo "<td>" . number_format($entry['total_steps']) . "</td>";
-                                    echo "</tr>";
-                                }
-                            }
-
-                            // Fetch steps for the logged-in user
-                            $todaySteps = 0; // Initialize the variable
+                            // Initialize today's steps for the logged-in user
+                            $todaySteps = 0;
 
                             if (isset($_SESSION['user_id'])) {
                                 $userId = $_SESSION['user_id'];
@@ -141,6 +129,34 @@
 
                                 if ($stepsData && isset($stepsData['step_count'])) {
                                     $todaySteps = $stepsData['step_count']; // Assign the step count if it exists
+                                }
+
+                                // Check if user_name is set in the session
+                                $userName = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Anonym';
+
+                                // Add the current user to the leaderboard if not already present
+                                $leaderboardData[] = [
+                                    'name' => htmlspecialchars($_SESSION['user_name']), // Use htmlspecialchars here for safe output
+                                    'total_steps' => $todaySteps,
+                                    'rank' => null // Rank will be assigned in the getLeaderboard method
+                                ];
+                            }
+
+                            // Display the leaderboard
+                            if (empty($leaderboardData)) {
+                                echo "<tr><td colspan='3' class='no-data'>Inga deltagare än. Bli först att gå med!</td></tr>";
+                            } else {
+                                // If only one user is logged in, set their rank to 1
+                                if (count($leaderboardData) === 1) {
+                                    $leaderboardData[0]['rank'] = 1; // Assign rank 1 to the only user
+                                }
+
+                                foreach ($leaderboardData as $entry) {
+                                    echo "<tr>";
+                                    echo "<td>" . ($entry['rank'] ?? '-') . "</td>";
+                                    echo "<td>" . htmlspecialchars($entry['name']) . "</td>"; // Use htmlspecialchars for output
+                                    echo "<td>" . number_format($entry['total_steps']) . "</td>";
+                                    echo "</tr>";
                                 }
                             }
                             ?>
