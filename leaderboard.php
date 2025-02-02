@@ -15,7 +15,7 @@
     $client = new Google_Client();
     $client->setClientId($google_client_id);
     $client->setClientSecret($google_client_secret);
-    $client->setRedirectUri('http://localhost:8000/leaderboard.php');
+    $client->setRedirectUri('https://steg.uppsalasystemvetare.se/leaderboard.php');
     $client->addScope('https://www.googleapis.com/auth/fitness.activity.read');
     $client->addScope('profile');
     $client->addScope('email');
@@ -129,10 +129,29 @@
                                     echo "</tr>";
                                 }
                             }
+
+                            // Fetch steps for the logged-in user
+                            $todaySteps = 0; // Initialize the variable
+
+                            if (isset($_SESSION['user_id'])) {
+                                $userId = $_SESSION['user_id'];
+                                $today = date('Y-m-d');
+                                $stepsRef = $googleFit->db->getReference('steps/' . $userId . '/' . $today);
+                                $stepsData = $stepsRef->getValue();
+
+                                if ($stepsData && isset($stepsData['step_count'])) {
+                                    $todaySteps = $stepsData['step_count']; // Assign the step count if it exists
+                                }
+                            }
                             ?>
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div class="steps-today">
+                <h3>Dagens steg</h3>
+                <p><?php echo number_format($todaySteps); ?> steg</p>
             </div>
 
             <script>

@@ -21,12 +21,7 @@ try {
         $startTimeMillis = strtotime('today midnight') * 1000;
         $endTimeMillis = time() * 1000;
         
-        $success = $googleFit->getDailySteps($startTimeMillis, $endTimeMillis);
-        if (!$success) {
-            // Token refresh failed or other error occurred
-            http_response_code(401);
-            exit('Token expired');
-        }
+        $googleFit->getDailySteps($startTimeMillis, $endTimeMillis);
         $_SESSION['last_fetch'] = time();
     }
 

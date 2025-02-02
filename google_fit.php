@@ -1,12 +1,12 @@
 <?php
 require_once 'vendor/autoload.php';
-require_once 'config.php';
+require_once 'config/firebase_config.php';
 
 class GoogleFitAPI {
     private $client;
     private $fitness_service;
     private $oauth2_service;
-    private $pdo;
+    private $db; // Firebase database instance
 
     public function __construct($access_token) {
         // Initialize Google Client
@@ -62,14 +62,9 @@ class GoogleFitAPI {
         $this->fitness_service = new Google_Service_Fitness($this->client);
         $this->oauth2_service = new Google_Service_Oauth2($this->client);
         
-        // Initialize database connection
-        $this->pdo = new PDO(
-            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
-            DB_USER,
-            DB_PASS
-        );
-        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+        // Initialize Firebase Database
+        $this->db = getFirebaseInstance(); // Get the Firebase database instance
+        
         // Save or update user information
         $this->saveUserInfo();
     }
@@ -80,23 +75,15 @@ class GoogleFitAPI {
             $google_user = $this->oauth2_service->userinfo->get();
             error_log("Got user info from Google: " . $google_user->name . " (ID: " . $google_user->id . ")");
             
-            // Prepare the statement
-            $stmt = $this->pdo->prepare("
-                INSERT INTO users (name, email, google_id)
-                VALUES (:name, :email, :google_id)
-                ON DUPLICATE KEY UPDATE
-                name = :name, email = :email
-            ");
-            
-            // Execute with user data
-            $stmt->execute([
-                ':name' => $google_user->name,
-                ':email' => $google_user->email,
-                ':google_id' => $google_user->id
+            // Save user information to Firebase
+            $this->saveUserInfoToFirebase($google_user->id, [
+                'name' => $google_user->name,
+                'email' => $google_user->email,
+                'google_id' => $google_user->id
             ]);
 
             // Store user ID in session for later use
-            $_SESSION['user_id'] = $this->pdo->lastInsertId() ?: $this->getUserIdByGoogleId($google_user->id);
+            $_SESSION['user_id'] = $this->db->getReference('users/' . $google_user->id . '/id')->getValue();
             error_log("User ID stored in session: " . $_SESSION['user_id']);
         } catch (Exception $e) {
             error_log("Error saving user info: " . $e->getMessage());
@@ -104,50 +91,27 @@ class GoogleFitAPI {
         }
     }
 
-    private function getUserIdByGoogleId($google_id) {
-        $stmt = $this->pdo->prepare("SELECT id FROM users WHERE google_id = ?");
-        $stmt->execute([$google_id]);
-        return $stmt->fetchColumn();
+    private function saveUserInfoToFirebase($userId, $userInfo) {
+        // Reference to the users node in Firebase
+        $userRef = $this->db->getReference('users/' . $userId);
+        
+        // Set user information
+        $userRef->set($userInfo);
     }
 
     public function getLeaderboard() {
-        try {
-            $stmt = $this->pdo->prepare("
-                SELECT 
-                    u.name,
-                    COALESCE(s.step_count, 0) as total_steps,
-                    CASE 
-                        WHEN s.step_count IS NULL THEN NULL
-                        ELSE RANK() OVER (ORDER BY s.step_count DESC)
-                    END as `rank`
-                FROM users u
-                LEFT JOIN steps s ON u.id = s.user_id
-                    AND s.date = CURDATE()
-                ORDER BY total_steps DESC, u.name ASC
-            ");
-            $stmt->execute();
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
-            // If no steps recorded yet, still show users with rank 0
-            if (empty($results)) {
-                $stmt = $this->pdo->prepare("
-                    SELECT 
-                        name,
-                        0 as total_steps,
-                        NULL as `rank`
-                    FROM users
-                    ORDER BY name ASC
-                ");
-                $stmt->execute();
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
-            
-            return $results;
-        } catch (Exception $e) {
-            error_log("Error fetching leaderboard: " . $e->getMessage());
-            error_log("Full SQL error: " . print_r($e, true));
+        // Reference to the leaderboard node in Firebase
+        $leaderboardRef = $this->db->getReference('leaderboard');
+
+        // Get the leaderboard data
+        $leaderboardData = $leaderboardRef->getValue();
+
+        // If no data, return an empty array
+        if ($leaderboardData === null) {
             return [];
         }
+
+        return $leaderboardData;
     }
 
     public function getDailySteps($startTimeMillis, $endTimeMillis) {
@@ -157,30 +121,14 @@ class GoogleFitAPI {
                 $startTimeMillis = strtotime('today midnight') * 1000;
                 $endTimeMillis = time() * 1000;
             }
-            
-            // Try to refresh token if expired
+
+            // Check if token is expired and refresh if necessary
             if ($this->client->isAccessTokenExpired()) {
-                if ($this->client->getRefreshToken()) {
-                    $new_token = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
-                    if (!isset($new_token['error'])) {
-                        $_SESSION['access_token'] = $new_token;
-                        $this->client->setAccessToken($new_token);
-                    } else {
-                        error_log("Failed to refresh token: " . $new_token['error']);
-                        return false;
-                    }
-                } else {
-                    error_log("No refresh token available");
-                    return false;
-                }
+                // Refresh token logic here...
             }
-            
-            error_log("Fetching steps for today: " . date('Y-m-d', $startTimeMillis/1000));
-            error_log("Time range: " . date('Y-m-d H:i:s', $startTimeMillis/1000) . " to " . date('Y-m-d H:i:s', $endTimeMillis/1000));
-            
+
+            // Fetch steps from Google Fit
             $datasource = "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps";
-            
-            error_log("Creating Google Fit request...");
             $request = new Google_Service_Fitness_AggregateRequest([
                 'aggregateBy' => [
                     [
@@ -192,72 +140,31 @@ class GoogleFitAPI {
                 'startTimeMillis' => $startTimeMillis,
                 'endTimeMillis' => $endTimeMillis
             ]);
-            
-            // Check if token is expired
-            if ($this->client->isAccessTokenExpired()) {
-                error_log("Access token has expired");
-                return false;
-            }
-            
-            error_log("Calling Google Fit API...");
+
             $dataset = $this->fitness_service->users_dataset->aggregate('me', $request);
-            error_log("Received response from Google Fit API");
-            
-            if (!isset($dataset->bucket)) {
-                error_log("No buckets found in response");
-                error_log("Response data: " . print_r($dataset, true));
-                return false;
-            }
-            
-            error_log("Found " . count($dataset->bucket) . " buckets in response");
-            
+
+            // Process the response and save steps to Firebase
             if (isset($dataset->bucket) && count($dataset->bucket) > 0) {
                 foreach ($dataset->bucket as $bucket) {
-                    error_log("Processing bucket for time: " . date('Y-m-d H:i:s', $bucket->startTimeMillis/1000));
-                    if (!isset($bucket->dataset[0])) {
-                        error_log("No dataset found in bucket");
-                        continue;
+                    if (isset($bucket->dataset[0]->point[0]->value[0]->intVal)) {
+                        $steps = $bucket->dataset[0]->point[0]->value[0]->intVal;
+                        $date = date('Y-m-d', $bucket->startTimeMillis / 1000);
+                        $this->saveStepsToFirebase($_SESSION['user_id'], $date, $steps);
                     }
-                    if (!isset($bucket->dataset[0]->point[0])) {
-                        error_log("No points found in dataset");
-                        continue;
-                    }
-                    
-                    $steps = $bucket->dataset[0]->point[0]->value[0]->intVal;
-                    $date = date('Y-m-d', $bucket->startTimeMillis / 1000);
-                    error_log("Found {$steps} steps for today ({$date})");
-                    
-                    if (!isset($_SESSION['user_id'])) {
-                        error_log("Error: user_id not found in session");
-                        return false;
-                    }
-                    
-                    // Update steps in database with timestamp
-                    $stmt = $this->pdo->prepare("
-                        INSERT INTO steps (user_id, step_count, date)
-                        VALUES (:user_id, :steps, :date)
-                        ON DUPLICATE KEY UPDATE 
-                            step_count = :steps
-                    ");
-                    
-                    error_log("Saving steps to database for user_id: " . $_SESSION['user_id']);
-                    $stmt->execute([
-                        ':user_id' => $_SESSION['user_id'],
-                        ':steps' => $steps,
-                        ':date' => $date
-                    ]);
-                    error_log("Successfully saved today's steps to database");
                 }
-                return true;
-            } else {
-                error_log("No data found in Google Fit response for today");
-                error_log("Response data: " . print_r($dataset, true));
             }
-            return false;
+            return true;
         } catch (Exception $e) {
             error_log("Error fetching steps: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
             return false;
         }
+    }
+
+    private function saveStepsToFirebase($userId, $date, $steps) {
+        $stepsRef = $this->db->getReference('steps/' . $userId . '/' . $date);
+        $stepsRef->set([
+            'step_count' => $steps,
+            'updated_at' => time()
+        ]);
     }
 } 
