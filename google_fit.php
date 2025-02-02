@@ -83,7 +83,7 @@ class GoogleFitAPI {
             ]);
 
             // Store user ID in session for later use
-            $_SESSION['user_id'] = $this->db->getReference('users/' . $google_user->id . '/id')->getValue();
+            $_SESSION['user_id'] = $google_user->id; // Store the Google ID directly
             error_log("User ID stored in session: " . $_SESSION['user_id']);
         } catch (Exception $e) {
             error_log("Error saving user info: " . $e->getMessage());
@@ -124,7 +124,7 @@ class GoogleFitAPI {
 
             // Check if token is expired and refresh if necessary
             if ($this->client->isAccessTokenExpired()) {
-                // Refresh token logic here...
+                $this->refreshAccessToken(); // Call the refresh logic
             }
 
             // Fetch steps from Google Fit
@@ -166,5 +166,26 @@ class GoogleFitAPI {
             'step_count' => $steps,
             'updated_at' => time()
         ]);
+    }
+
+    private function refreshAccessToken() {
+        // Logic to refresh the access token
+        $refresh_token = $this->client->getRefreshToken();
+        if ($refresh_token) {
+            $new_token = $this->client->fetchAccessTokenWithRefreshToken($refresh_token);
+            if (!isset($new_token['error'])) {
+                $_SESSION['access_token'] = $new_token;
+                $this->client->setAccessToken($new_token);
+                error_log("Token refreshed successfully");
+            } else {
+                error_log("Error refreshing token: " . $new_token['error']);
+            }
+        } else {
+            error_log("No refresh token available");
+        }
+    }
+
+    public function getDatabase() {
+        return $this->db;
     }
 } 

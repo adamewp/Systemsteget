@@ -136,7 +136,7 @@
                             if (isset($_SESSION['user_id'])) {
                                 $userId = $_SESSION['user_id'];
                                 $today = date('Y-m-d');
-                                $stepsRef = $googleFit->db->getReference('steps/' . $userId . '/' . $today);
+                                $stepsRef = $googleFit->getDatabase()->getReference('steps/' . $userId . '/' . $today);
                                 $stepsData = $stepsRef->getValue();
 
                                 if ($stepsData && isset($stepsData['step_count'])) {
