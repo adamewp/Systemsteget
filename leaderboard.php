@@ -68,6 +68,7 @@
                     <li><a href="leaderboard.php">Topplista</a></li>
                     <li><a href="rules.php">Regler</a></li>
                     <li><a href="contact.php">Kontakt</a></li>
+                    <li><a href="privacy.php">Integritetspolicy</a></li>
                     <?php if ($isLoggedIn): ?>
                         <li><a href="logout.php">Logga ut</a></li>
                     <?php endif; ?>
@@ -154,7 +155,7 @@
                                 foreach ($leaderboardData as $entry) {
                                     echo "<tr>";
                                     echo "<td>" . ($entry['rank'] ?? '-') . "</td>";
-                                    echo "<td>" . htmlspecialchars($entry['name']) . "</td>"; // Use htmlspecialchars for output
+                                    echo "<td>" . htmlspecialchars($entry['name']) . "</td>";
                                     echo "<td>" . number_format($entry['total_steps']) . "</td>";
                                     echo "</tr>";
                                 }

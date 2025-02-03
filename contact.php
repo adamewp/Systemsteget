@@ -20,6 +20,7 @@
                     <li><a href="leaderboard.php">Topplista</a></li>
                     <li><a href="rules.php">Regler</a></li>
                     <li><a href="contact.php">Kontakt</a></li>
+                    <li><a href="privacy.php">Integritetspolicy</a></li>
                 </ul>
             </nav>
         </div>
