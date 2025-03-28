@@ -1,129 +1,68 @@
-# Uppsala Systemvetare Stegutmaning
+# Systemsteget
 
-En webbapplikation för att spåra steg och underhålla en topplista för IT-sektionen på Uppsala Systemvetare. Applikationen integrerar med Google Fit för att spåra steg och skapa en vänskaplig tävling mellan kollegor.
+En stegutmaning för Uppsala Systemvetare. Applikationen skapar en vänskaplig tävling mellan kollegor.
 
 ## Funktioner
 
-- Google Fit-integration för automatisk stegräkning
+- Automatisk stegräkning
 - Realtidsuppdaterad topplista
-- Användarautentisering via Google OAuth
-- Kontaktformulär för support
-- Regler och riktlinjer
+- Responsiv design
+- Användarautentisering
 
-## Tekniska Krav
+## Teknisk Stack
 
-- PHP 8.0 eller högre
+- PHP 8.0+
+- MySQL
+- HTML5/CSS3
+- JavaScript
 - Firebase Realtime Database
-- Webbserver (Apache/Nginx)
-- Composer för PHP-beroenden
-- Google Fit API-uppgifter
-- SSL-certifikat för produktion
 
-## Installation för Lokal Utveckling
+## Installation
 
-1. Klona detta repository
-2. Kör `composer install` för att installera beroenden
-3. Kopiera `.env.example` till `.env` och uppdatera med dina uppgifter
-4. Konfigurera Firebase:
-   - Skapa ett Firebase-projekt i Firebase Console
-   - Ladda ner Firebase credentials JSON-fil och placera i `/config/firebase-credentials.json`
-   - Uppdatera Firebase-konfigurationen i `.env`
-5. Konfigurera Google OAuth:
-   - Skapa OAuth 2.0-uppgifter i Google Cloud Console
-   - Lägg till tillåtna redirect URIs
-   - Uppdatera Google OAuth-konfigurationen i `.env`
-6. Starta utvecklingsservern: `php -S localhost:8000`
+1. Klona repot:
+```bash
+git clone https://github.com/uppsalasystemvetare/systemsteget.git
+```
 
-## Produktionsdeployment
+2. Installera beroenden:
+```bash
+composer install
+```
 
-1. Förbered servermiljön:
-   ```bash
-   # Installera nödvändiga paket
-   apt-get update
-   apt-get install php8.0 php8.0-fpm nginx composer
-   ```
+3. Kopiera och konfigurera miljövariabler:
+```bash
+cp .env.example .env
+```
 
-2. Konfigurera Nginx:
-   - Sätt upp SSL med Let's Encrypt
-   - Konfigurera virtual host
-   - Aktivera PHP-FPM
+4. Konfigurera databasen:
+```bash
+mysql -u root -p < setup_database.sql
+```
 
-3. Miljökonfiguration:
-   - Kopiera `.env.example` till `.env`
-   - Uppdatera alla miljövariabler för produktion
-   - Sätt `APP_ENV=production`
-   - Konfigurera säkra värden för alla hemligheter
-
-4. Deployment:
-   ```bash
-   # Klona repository
-   git clone [repository-url]
-   cd [project-directory]
-   
-   # Installera beroenden
-   composer install --no-dev
-   
-   # Sätt rättigheter
-   chown -R www-data:www-data storage/
-   chmod -R 755 storage/
-   ```
-
-5. Säkerhetskontroller:
-   - Verifiera att alla känsliga filer är exkluderade från Git
-   - Kontrollera att Firebase-credentials är säkert lagrade
-   - Verifiera SSL-konfiguration
-   - Sätt upp brandväggsregler
-
-6. Monitoring:
-   - Konfigurera loggning
-   - Sätt upp felrapportering
-   - Aktivera säkerhetskopiering
-
-## Underhåll
-
-- Regelbundna säkerhetsuppdateringar
-- Backup av Firebase-data
-- Loggövervakning
-- SSL-certifikatförnyelse
+5. Starta utvecklingsservern:
+```bash
+php -S localhost:8000
+```
 
 ## Felsökning
 
-Vanliga problem och lösningar:
+1. Databasanslutningsfel:
+   - Kontrollera att MySQL-tjänsten körs
+   - Verifiera databasuppgifterna i .env
+   - Kontrollera att databasen existerar
 
-1. Firebase-anslutningsproblem:
-   - Verifiera credentials-fil
-   - Kontrollera Firebase-regler
-   - Verifiera nätverksåtkomst
+2. Autentiseringsfel:
+   - Rensa webbläsarens cache och cookies
+   - Kontrollera att sessionshanteringen fungerar
 
-2. Google OAuth-fel:
-   - Kontrollera tillåtna redirect URIs
-   - Verifiera client ID och secret
-   - Kontrollera SSL-certifikat
+## Bidra
 
-3. Prestandaproblem:
-   - Aktivera PHP OPcache
-   - Konfigurera caching
-   - Optimera Firebase-queries
+1. Forka repot
+2. Skapa en feature branch
+3. Commita dina ändringar
+4. Pusha till branchen
+5. Öppna en Pull Request
 
-## Framtida Planer
+## Licens
 
-- Migrering till Firestore som databas
-- Publicering på steg.uppsalasystemvetare.se
-- Förbättrad säkerhet och skalbarhet
-
-## Konfiguration
-
-1. Skapa ett Google Cloud-projekt och aktivera Google Fit API
-2. Konfigurera OAuth 2.0-uppgifter
-3. Uppdatera `config.php` med dina uppgifter
-4. Kontrollera att databasen är korrekt konfigurerad
-
-## Utveckling
-
-Detta projekt underhålls internt av IT-sektionen på Uppsala Systemvetare. Kontakta projektansvarig för att bidra till utvecklingen.
-
-## Säkerhet
-
-- Commita aldrig `config.php` med riktiga uppgifter
-- Håll Google OAuth-uppgifter säkra
-- Regelbundna säkerhetsuppdateringar rekommenderas
+Detta projekt är licensierat under MIT-licensen - se [LICENSE](LICENSE) filen för detaljer.

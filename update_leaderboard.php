@@ -1,59 +1,36 @@
 <?php
-session_start();
-require_once 'vendor/autoload.php';
 require_once 'config.php';
-require_once 'google_fit.php';
+require_once 'db_connection.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['access_token']) || !$_SESSION['access_token']) {
-    http_response_code(401);
-    exit('Unauthorized');
-}
-
-// Set timezone to ensure consistent date handling
-date_default_timezone_set('Europe/Stockholm');
-
-try {
-    $googleFit = new GoogleFitAPI($_SESSION['access_token']);
-
-    if (isset($_SESSION['user_id'])) {
-        // Force a fresh fetch from Google Fit
-        $startTimeMillis = strtotime('today midnight') * 1000;
-        $endTimeMillis = time() * 1000;
+function getLeaderboardData() {
+    global $db;
+    $today = date('Y-m-d');
+    
+    $query = "
+        SELECT u.name, COALESCE(s.step_count, 0) as steps 
+        FROM users u 
+        LEFT JOIN steps s ON u.id = s.user_id AND s.date = ?
+        ORDER BY steps DESC";
         
-        $googleFit->getDailySteps($startTimeMillis, $endTimeMillis);
-        $_SESSION['last_fetch'] = time();
-    }
-
-    $leaderboardData = $googleFit->getLeaderboard();
-} catch (Exception $e) {
-    error_log("Error in update_leaderboard.php: " . $e->getMessage());
-    http_response_code(500);
-    exit('Error updating leaderboard');
+    $stmt = $db->prepare($query);
+    $stmt->bind_param("s", $today);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_all(MYSQLI_ASSOC);
 }
+
+$leaderboardData = getLeaderboardData();
 ?>
 
-<table class="leaderboard-table">
-    <thead>
-        <tr>
-            <th>Plats</th>
-            <th>Namn</th>
-            <th>Antal steg idag</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        if (empty($leaderboardData)) {
-            echo "<tr><td colspan='3' class='no-data'>Inga deltagare än. Bli först att gå med!</td></tr>";
-        } else {
-            foreach ($leaderboardData as $entry) {
-                echo "<tr>";
-                echo "<td>" . ($entry['rank'] ?? '-') . "</td>";
-                echo "<td>" . htmlspecialchars($entry['name']) . "</td>";
-                echo "<td>" . number_format($entry['total_steps']) . "</td>";
-                echo "</tr>";
-            }
-        }
-        ?>
-    </tbody>
-</table> 
+<div class="leaderboard">
+    <?php if (empty($leaderboardData)): ?>
+        <p class="no-data">Inga deltagare än. Bli först att gå med!</p>
+    <?php else: ?>
+        <?php foreach ($leaderboardData as $user): ?>
+        <div class="leaderboard-item">
+            <span class="user-name"><?php echo htmlspecialchars($user['name']); ?></span>
+            <span class="steps"><?php echo number_format($user['steps']); ?> steg</span>
+        </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div> 

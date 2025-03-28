@@ -34,8 +34,8 @@
         <h2>Information vi samlar in</h2>
         <p>Vi samlar in följande typer av information:</p>
         <ul>
-            <li><strong>Personlig information:</strong> När du registrerar dig för att använda vår tjänst kan vi samla in information som ditt namn, e-postadress och Google ID.</li>
-            <li><strong>Aktivitetsdata:</strong> Vi samlar in data om dina steg och fysisk aktivitet via Google Fit API för att kunna visa din prestation på vår topplista.</li>
+            <li><strong>Personlig information:</strong> Vi samlar in grundläggande information som ditt namn och e-postadress.</li>
+            <li><strong>Aktivitetsdata:</strong> Vi samlar in data om dina steg och fysisk aktivitet för att kunna visa din prestation på vår topplista.</li>
         </ul>
 
         <h2>Hur vi använder din information</h2>
@@ -66,5 +66,24 @@
     <footer>
         <p>&copy; <?php echo date('Y'); ?> Uppsala Systemvetare. Alla rättigheter förbehållna.</p>
     </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const nav = document.querySelector('nav');
+        
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            nav.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!nav.contains(e.target) && !menuToggle.contains(e.target) && nav.classList.contains('active')) {
+                menuToggle.classList.remove('active');
+                nav.classList.remove('active');
+            }
+        });
+    </script>
 </body>
 </html>

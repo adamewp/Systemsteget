@@ -1,63 +1,46 @@
+<?php
+session_start();
+require_once 'config.php';
+require_once 'db_connection.php';
+
+// Basic error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+try {
+    // Updated query without the date filter
+    $query = "
+        SELECT u.name, SUM(s.step_count) AS total_steps
+        FROM users u
+        JOIN steps s ON u.id = s.user_id
+        GROUP BY u.id
+        ORDER BY total_steps DESC";
+        
+    $stmt = $db->prepare($query);
+    if (!$stmt) {
+        throw new Exception("Prepare failed: " . $db->error);
+    }
+    
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $leaderboardData = $result->fetch_all(MYSQLI_ASSOC);
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Systemsteget - Uppsala Systemvetare</title>
+    <title>Systemsteget - Topplista</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    <?php
-    require_once 'vendor/autoload.php';
-    require_once 'config.php';
-
-    session_start();
-
-    // Initialize Google Client
-    $client = new Google_Client();
-    $client->setClientId($google_client_id);
-    $client->setClientSecret($google_client_secret);
-    $client->setRedirectUri('https://steg.uppsalasystemvetare.se/leaderboard.php');
-    $client->addScope('https://www.googleapis.com/auth/fitness.activity.read');
-    $client->addScope('profile');
-    $client->addScope('email');
-    $client->setAccessType('offline');
-    $client->setPrompt('consent');
-    $client->setIncludeGrantedScopes(true);
-
-    // Handle Google OAuth login
-    if (isset($_GET['code'])) {
-        try {
-            $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
-            error_log("Received token from Google: " . json_encode($token));
-            
-            if (!isset($token['error'])) {
-                // Make sure we store the refresh token
-                if (isset($token['refresh_token'])) {
-                    error_log("Received refresh token: " . $token['refresh_token']);
-                } else {
-                    error_log("No refresh token received from Google");
-                }
-                
-                $_SESSION['access_token'] = $token;
-                header('Location: leaderboard.php');
-                exit;
-            } else {
-                error_log("Error in token response: " . $token['error']);
-            }
-        } catch (Exception $e) {
-            error_log("Exception during token fetch: " . $e->getMessage());
-        }
-    }
-
-    // Check if user is logged in and has valid token data
-    $isLoggedIn = isset($_SESSION['access_token']) && 
-                  is_array($_SESSION['access_token']) && 
-                  isset($_SESSION['access_token']['access_token']);
-    ?>
 </head>
 <body>
     <header>
         <div class="nav-container">
-            <img src="US_logo_other.png" alt="Uppsala Systemvetare Logo" class="logo">
+            <img src="/US_logo_other.png" alt="Logo" class="logo">
             <button class="menu-toggle" aria-label="Toggle menu">
                 <span></span>
                 <span></span>
@@ -69,179 +52,53 @@
                     <li><a href="rules.php">Regler</a></li>
                     <li><a href="contact.php">Kontakt</a></li>
                     <li><a href="privacy.php">Integritetspolicy</a></li>
-                    <?php if ($isLoggedIn): ?>
-                        <li><a href="logout.php">Logga ut</a></li>
-                    <?php endif; ?>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main>
-        <h1>Systemsteget</h1>
+        <h1>Topplista</h1>
         
-        <?php if (!$isLoggedIn): ?>
-            <div class="auth-section">
-                <h2>Delta i stegutmaningen</h2>
-                <p>Anslut med ditt Google-konto för att delta i stegutmaningen!</p>
-                <a href="<?php echo $client->createAuthUrl(); ?>" class="google-login-btn">
-                    Logga in med Google
-                </a>
-            </div>
-        <?php else: ?>
-            <div class="leaderboard-container">
-                <div class="leaderboard-header">
-                    <h2>Aktuell topplista</h2>
-                    <p>Dagens steg (<?php echo date('Y-m-d'); ?>)</p>
-                    <p>Senast uppdaterad: <span id="last-update"><?php echo date('Y-m-d H:i:s'); ?></span></p>
-                    <button id="manual-refresh" class="refresh-btn">Uppdatera nu</button>
+        <div class="leaderboard-container">
+            <?php if (empty($leaderboardData)): ?>
+                <p class="no-data">Inga deltagare än.</p>
+            <?php else: ?>
+                <div class="leaderboard-table">
+                    <?php foreach ($leaderboardData as $index => $user): ?>
+                        <div class="leaderboard-item" style="padding: 15px; color: var(--text-color);">
+                            <?php echo ($index + 1) . ". " . htmlspecialchars($user['name']); ?>: 
+                            <?php echo str_replace(' ', '', number_format($user['total_steps'])); ?> steg
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <div id="leaderboard-content">
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th>Plats</th>
-                                <th>Namn</th>
-                                <th>Antal steg idag</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            require_once 'google_fit.php';
-                            $googleFit = new GoogleFitAPI($_SESSION['access_token']);
-                            
-                            if (isset($_SESSION['user_id'])) {
-                                $startTimeMillis = strtotime('today midnight') * 1000;
-                                $endTimeMillis = time() * 1000;
-                                $googleFit->getDailySteps($startTimeMillis, $endTimeMillis);
-                                $_SESSION['last_fetch'] = time();
-                            }
-                            
-                            $leaderboardData = $googleFit->getLeaderboard();
-                            
-                            // Initialize today's steps for the logged-in user
-                            $todaySteps = 0;
+            <?php endif; ?>
+        </div>
 
-                            if (isset($_SESSION['user_id'])) {
-                                $userId = $_SESSION['user_id'];
-                                $today = date('Y-m-d');
-                                $stepsRef = $googleFit->getDatabase()->getReference('steps/' . $userId . '/' . $today);
-                                $stepsData = $stepsRef->getValue();
-
-                                if ($stepsData && isset($stepsData['step_count'])) {
-                                    $todaySteps = $stepsData['step_count']; // Assign the step count if it exists
-                                }
-
-                                // Check if user_name is set in the session
-                                $userName = isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : 'Anonym';
-
-                                // Add the current user to the leaderboard if not already present
-                                $leaderboardData[] = [
-                                    'name' => htmlspecialchars($_SESSION['user_name']), // Use htmlspecialchars here for safe output
-                                    'total_steps' => $todaySteps,
-                                    'rank' => null // Rank will be assigned in the getLeaderboard method
-                                ];
-                            }
-
-                            // Display the leaderboard
-                            if (empty($leaderboardData)) {
-                                echo "<tr><td colspan='3' class='no-data'>Inga deltagare än. Bli först att gå med!</td></tr>";
-                            } else {
-                                // If only one user is logged in, set their rank to 1
-                                if (count($leaderboardData) === 1) {
-                                    $leaderboardData[0]['rank'] = 1; // Assign rank 1 to the only user
-                                }
-
-                                foreach ($leaderboardData as $entry) {
-                                    echo "<tr>";
-                                    echo "<td>" . ($entry['rank'] ?? '-') . "</td>";
-                                    echo "<td>" . htmlspecialchars($entry['name']) . "</td>";
-                                    echo "<td>" . number_format($entry['total_steps']) . "</td>";
-                                    echo "</tr>";
-                                }
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="steps-today">
-                <h3>Dagens steg</h3>
-                <p><?php echo number_format($todaySteps); ?> steg</p>
-            </div>
-
-            <script>
-            // Mobile menu toggle
-            const menuToggle = document.querySelector('.menu-toggle');
-            const nav = document.querySelector('nav');
-            
-            menuToggle.addEventListener('click', () => {
-                menuToggle.classList.toggle('active');
-                nav.classList.toggle('active');
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!nav.contains(e.target) && !menuToggle.contains(e.target) && nav.classList.contains('active')) {
-                    menuToggle.classList.remove('active');
-                    nav.classList.remove('active');
-                }
-            });
-
-            // Function to update the leaderboard
-            function updateLeaderboard() {
-                fetch('update_leaderboard.php')
-                    .then(response => {
-                        if (!response.ok) {
-                            if (response.status === 401) {
-                                // Only redirect if we get an actual auth error message
-                                return response.text().then(text => {
-                                    if (text === 'Token expired' || text === 'Unauthorized') {
-                                        window.location.href = 'logout.php';
-                                        throw new Error('Session expired. Please log in again.');
-                                    }
-                                    return text;
-                                });
-                            }
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        // Only update if we got valid HTML
-                        if (html.includes('leaderboard-table')) {
-                            document.getElementById('leaderboard-content').innerHTML = html;
-                            document.getElementById('last-update').textContent = new Date().toLocaleString('sv-SE');
-                        } else {
-                            console.error('Invalid response:', html);
-                            throw new Error('Invalid response from server');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error updating leaderboard:', error);
-                        if (error.message === 'Session expired. Please log in again.') {
-                            // Error already handled
-                            return;
-                        }
-                        // Show error message to user
-                        document.getElementById('leaderboard-content').innerHTML = 
-                            '<div class="error-message">Det gick inte att uppdatera topplistan. Försök igen senare.</div>';
-                    });
-            }
-
-            // Manual refresh button
-            document.getElementById('manual-refresh').addEventListener('click', function() {
-                this.disabled = true;
-                updateLeaderboard();
-                setTimeout(() => this.disabled = false, 5000); // Prevent spam clicking
-            });
-            </script>
-        <?php endif; ?>
+        <p class="server-time">* Totalt antal steg under de senaste 7 dagarna.</p>
     </main>
 
     <footer>
         <p>&copy; <?php echo date('Y'); ?> Uppsala Systemvetare. Alla rättigheter förbehållna.</p>
     </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const nav = document.querySelector('nav');
+        
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            nav.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!nav.contains(e.target) && !menuToggle.contains(e.target) && nav.classList.contains('active')) {
+                menuToggle.classList.remove('active');
+                nav.classList.remove('active');
+            }
+        });
+    </script>
 </body>
-</html> 
+</html>

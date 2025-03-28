@@ -36,7 +36,7 @@ header {
 }
 
 .logo {
-    height: 50px;
+    height: 70px;
     width: auto;
     margin-right: 20px;
 }
@@ -157,25 +157,34 @@ h2 {
     background-color: var(--light-gray);
 }
 
-/* Buttons */
-.google-login-btn,
-.refresh-btn {
-    display: inline-block;
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    transition: var(--transition);
+.leaderboard-item {
+    padding: 15px;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--light-gray);
 }
 
-.google-login-btn:hover,
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+/* Buttons */
+.login-btn,
+.refresh-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px 0;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover,
 .refresh-btn:hover {
-    background-color: var(--accent-color);
-    transform: translateY(-1px);
+    background-color: #45a049;
 }
 
 /* Auth Section */
@@ -360,10 +369,21 @@ footer {
         line-height: 1.6;
     }
 
-    .google-login-btn,
+    .login-btn,
     .refresh-btn {
         font-size: 1.1rem;
         padding: 1rem 2rem;
+    }
+
+    footer {
+        padding: 1.5rem 0;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    footer p {
+        margin: 0.5rem 0;
+        line-height: 1.5;
     }
 }
 
@@ -382,7 +402,7 @@ footer {
         margin-bottom: 1rem;
     }
 
-    .google-login-btn,
+    .login-btn,
     .refresh-btn {
         width: 100%;
         text-align: center;
