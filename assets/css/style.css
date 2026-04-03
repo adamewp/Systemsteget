@@ -35,6 +35,15 @@ header {
     padding: 1rem 0;
 }
 
+.logo-link {
+    display: inline-flex;
+    align-items: center;
+    outline: none;
+    border: none;
+    text-decoration: none;
+    box-shadow: none;
+}
+
 .logo {
     height: 70px;
     width: auto;
@@ -104,11 +113,12 @@ h2 {
 
 /* Leaderboard Styles */
 .leaderboard-container {
-    background: var(--light-gray);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-top: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 0;
+    margin-top: 1rem;
     margin-bottom: 5rem;
+    overflow: hidden;
 }
 
 .leaderboard-header {
@@ -230,6 +240,23 @@ footer {
     opacity: 0.8;
 }
 
+/* Privacy & content page typography spacing */
+.privacy-content p,
+.privacy-content li {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+.privacy-content ul,
+.privacy-content ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.privacy-content h2 {
+    margin-top: 2rem;
+}
+
 /* Hamburger Menu */
 .menu-toggle {
     display: none;
@@ -328,9 +355,6 @@ footer {
         transform: translateY(-9px) rotate(-45deg);
     }
 
-    .leaderboard-container {
-        padding: 1.5rem;
-    }
 
     .leaderboard-header p {
         font-size: 1.1rem;

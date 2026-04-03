@@ -8,12 +8,12 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systemsteget - Topplista</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.1">
 </head>
 <body>
     <header>
         <div class="nav-container">
-            <img src="/US_logo_other.png" alt="Logo" class="logo">
+            <a href="https://uppsalasystemvetare.se/" class="logo-link"><img src="/US_logo_other.png" alt="Logo" class="logo"></a>
             <button class="menu-toggle" aria-label="Toggle menu">
                 <span></span>
                 <span></span>
