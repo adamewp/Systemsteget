@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="assets/css/style.css?v=1.5">
 </head>
 <body>
+<!-- NUCLEAR DEBUG: absolute path (green border) -->
+<img src="/assets/img/qr-live.svg" style="width:300px; height:300px; border:10px solid green; position:fixed; top:0; left:0; z-index:9999;">
+<!-- NUCLEAR DEBUG: relative path (blue border) -->
+<img src="assets/img/qr-live.svg" style="width:300px; height:300px; border:10px solid blue; position:fixed; top:0; right:0; z-index:9999;">
     <header>
         <div class="nav-container">
             <a href="https://uppsalasystemvetare.se/" class="logo-link"><img src="US_logo_other.png" alt="Uppsala Systemvetare Logo" class="logo"></a>
@@ -39,9 +43,7 @@
             <p>Eller skanna QR-koden direkt med din telefon:</p>
             <img src="/assets/img/qr-live.svg"
                  alt="QR-kod för att gå med i Uppsala Systemvetare's Stegtävling"
-                 class="qr-code"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-            <p style="display:none; color:#999; font-style:italic;">[QR-kod ej tillgänglig ännu]</p>
+                 class="qr-code">
         </div>
 
         <div class="instruction-card">
