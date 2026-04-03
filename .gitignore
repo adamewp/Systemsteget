@@ -4,6 +4,7 @@
 !.env.example
 
 # Configuration files with sensitive data
+config.php
 /config/firebase-credentials.json
 /config/*.json
 !/config/*.example.json
