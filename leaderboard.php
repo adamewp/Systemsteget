@@ -1,32 +1,5 @@
 <?php
 session_start();
-require_once 'config.php';
-require_once 'db_connection.php';
-
-// Basic error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-try {
-    // Updated query without the date filter
-    $query = "
-        SELECT u.name, SUM(s.step_count) AS total_steps
-        FROM users u
-        JOIN steps s ON u.id = s.user_id
-        GROUP BY u.id
-        ORDER BY total_steps DESC";
-        
-    $stmt = $db->prepare($query);
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . $db->error);
-    }
-    
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $leaderboardData = $result->fetch_all(MYSQLI_ASSOC);
-} catch (Exception $e) {
-    die("Error: " . $e->getMessage());
-}
 ?>
 
 <!DOCTYPE html>
@@ -61,21 +34,14 @@ try {
         <h1>Topplista</h1>
         
         <div class="leaderboard-container">
-            <?php if (empty($leaderboardData)): ?>
-                <p class="no-data">Inga deltagare än.</p>
-            <?php else: ?>
-                <div class="leaderboard-table">
-                    <?php foreach ($leaderboardData as $index => $user): ?>
-                        <div class="leaderboard-item" style="padding: 15px; color: var(--text-color);">
-                            <?php echo ($index + 1) . ". " . htmlspecialchars($user['name']); ?>: 
-                            <?php echo str_replace(' ', '', number_format($user['total_steps'])); ?> steg
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+            <iframe
+                src="https://distantrace.com/en/challenges/fXmYWdzjFPHlgg/embedded/challengers/"
+                width="100%"
+                height="800px"
+                style="border: none; display: block;"
+                allowfullscreen>
+            </iframe>
         </div>
-
-        <p class="server-time">* Totalt antal steg under de senaste 7 dagarna.</p>
     </main>
 
     <footer>
