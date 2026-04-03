@@ -8,7 +8,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systemsteget - Topplista (TEST)</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=1.1">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.3">
 </head>
 <body>
     <header>
@@ -22,6 +22,7 @@ session_start();
             <nav>
                 <ul>
                     <li><a href="leaderboard.php">Topplista</a></li>
+                    <li><a href="how-to.php">Hur det fungerar</a></li>
                     <li><a href="rules.php">Regler</a></li>
                     <li><a href="contact.php">Kontakt</a></li>
                     <li><a href="privacy.php">Integritetspolicy</a></li>
@@ -32,6 +33,18 @@ session_start();
 
     <main>
         <h1>Topplista (TEST)</h1>
+
+        <div class="instruction-card">
+            <h2>Test-instruktioner</h2>
+            <p>Detta är en testmiljö för funktionärer. Din data här påverkar inte den skarpa tävlingen.</p>
+
+            <h3>Gå med i testutmaningen "Stegtävling"</h3>
+            <p>Gå in på <a href="https://distantrace.com" target="_blank" rel="noopener">distantrace.com</a>, skapa ett konto och använd koden nedan för att gå med:</p>
+            <p class="join-code">KKYFQM58</p>
+
+            <p>Eller skanna QR-koden:</p>
+            <img src="assets/img/qr-test.png" alt="QR-kod för testutmaningen" class="qr-code">
+        </div>
 
         <div class="leaderboard-container">
             <iframe

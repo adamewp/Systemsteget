@@ -8,7 +8,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systemsteget - Topplista</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=1.1">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.3">
 </head>
 <body>
     <header>
@@ -22,6 +22,7 @@ session_start();
             <nav>
                 <ul>
                     <li><a href="leaderboard.php">Topplista</a></li>
+                    <li><a href="how-to.php">Hur det fungerar</a></li>
                     <li><a href="rules.php">Regler</a></li>
                     <li><a href="contact.php">Kontakt</a></li>
                     <li><a href="privacy.php">Integritetspolicy</a></li>
