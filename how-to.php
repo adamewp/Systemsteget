@@ -35,8 +35,8 @@
         <div class="instruction-card">
             <h2>1. Ladda ner appen</h2>
             <p>Sök efter och ladda ner appen <strong>DistantRace</strong> i App Store eller Google Play.</p>
-            <a href="https://apps.apple.com/app/distantrace/id1439716286" target="_blank" rel="noopener" class="app-btn">App Store</a>
-            <a href="https://play.google.com/store/apps/details?id=com.distantrace" target="_blank" rel="noopener" class="app-btn">Google Play</a>
+            <a href="https://apps.apple.com/se/app/distant-race-app/id6447062298" target="_blank" rel="noopener" class="app-btn">App Store</a>
+            <a href="https://play.google.com/store/apps/details?id=com.distantrace.app&hl=gsw" target="_blank" rel="noopener" class="app-btn">Google Play</a>
         </div>
 
         <div class="instruction-card">
