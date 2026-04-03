@@ -8,7 +8,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systemsteget - Topplista (TEST)</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=1.4">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.5">
 </head>
 <body>
     <header>
@@ -43,7 +43,7 @@ session_start();
             <p class="join-code">KKYFQM58</p>
 
             <p>Eller skanna QR-koden:</p>
-            <img src="assets/img/qr-test.svg" alt="QR-kod för testutmaningen" class="qr-code">
+            <img src="/assets/img/qr-test.svg" alt="QR-kod för testutmaningen" class="qr-code">
         </div>
 
         <div class="leaderboard-container">

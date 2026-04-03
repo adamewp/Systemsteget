@@ -294,8 +294,9 @@ footer {
 }
 
 .qr-code {
-    display: block;
-    max-width: 200px;
+    display: block !important;
+    width: 200px !important;
+    height: 200px !important;
     margin: 1rem auto;
 }
 

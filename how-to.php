@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hur det fungerar - Systemsteget</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=1.4">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.5">
 </head>
 <body>
     <header>
@@ -37,7 +37,7 @@
             <p>Skapa ett konto på <a href="https://distantrace.com" target="_blank" rel="noopener">distantrace.com</a> om du inte redan har ett. Gå sedan med i tävlingen med hjälp av koden nedan:</p>
             <p class="join-code">Q5986W3W</p>
             <p>Eller skanna QR-koden direkt med din telefon:</p>
-            <img src="assets/img/qr-live.svg"
+            <img src="/assets/img/qr-live.svg"
                  alt="QR-kod för att gå med i Uppsala Systemvetare's Stegtävling"
                  class="qr-code"
                  onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
