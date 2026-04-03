@@ -293,10 +293,28 @@ footer {
     margin: 1rem 0;
 }
 
+.app-btn {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.app-btn:hover {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
 .qr-code {
-    display: block !important;
-    width: 200px !important;
-    height: 200px !important;
+    display: block;
+    width: 200px;
+    height: auto;
     margin: 1rem auto;
 }
 

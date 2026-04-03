@@ -8,13 +8,9 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Systemsteget - Topplista (TEST)</title>
-    <link rel="stylesheet" href="assets/css/style.css?v=1.5">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.6">
 </head>
 <body>
-<!-- NUCLEAR DEBUG: absolute path (green border) -->
-<img src="/assets/img/qr-test.svg" style="width:300px; height:300px; border:10px solid green; position:fixed; top:0; left:0; z-index:9999;">
-<!-- NUCLEAR DEBUG: relative path (blue border) -->
-<img src="assets/img/qr-test.svg" style="width:300px; height:300px; border:10px solid blue; position:fixed; top:0; right:0; z-index:9999;">
     <header>
         <div class="nav-container">
             <a href="https://uppsalasystemvetare.se/" class="logo-link"><img src="/US_logo_other.png" alt="Logo" class="logo"></a>
@@ -39,11 +35,18 @@ session_start();
         <h1>Topplista (TEST)</h1>
 
         <div class="instruction-card">
+            <h2>1. Ladda ner appen</h2>
+            <p>Sök efter och ladda ner appen <strong>DistantRace</strong> i App Store eller Google Play.</p>
+            <a href="https://apps.apple.com/app/distantrace/id1439716286" target="_blank" rel="noopener" class="app-btn">App Store</a>
+            <a href="https://play.google.com/store/apps/details?id=com.distantrace" target="_blank" rel="noopener" class="app-btn">Google Play</a>
+        </div>
+
+        <div class="instruction-card">
             <h2>Test-instruktioner</h2>
             <p>Detta är en testmiljö för funktionärer. Din data här påverkar inte den skarpa tävlingen.</p>
 
             <h3>Gå med i testutmaningen "Stegtävling"</h3>
-            <p>Gå in på <a href="https://distantrace.com" target="_blank" rel="noopener">distantrace.com</a>, skapa ett konto och använd koden nedan för att gå med:</p>
+            <p>Skapa ett konto i appen och använd koden nedan för att gå med:</p>
             <p class="join-code">KKYFQM58</p>
 
             <p>Eller skanna QR-koden:</p>
