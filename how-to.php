@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hur det fungerar - Systemsteget</title>
+    <link rel="icon" type="image/png" href="/favicon.png?v=1.0">
     <link rel="stylesheet" href="assets/css/style.css?v=1.6">
 </head>
 <body>
