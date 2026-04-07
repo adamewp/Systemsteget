@@ -31,7 +31,7 @@
     <main class="privacy-content">
         <h1>Hur det fungerar</h1>
 
-        <p>Välkommen till <strong>Uppsala Systemvetare's Stegtävling</strong>! Följ stegen nedan för att komma igång via plattformen Distant Race.</p>
+        <p>Välkommen till <strong>Systemsteget</strong>! Följ stegen nedan för att komma igång via plattformen Distant Race.</p>
 
         <div class="instruction-card">
             <h2>1. Ladda ner appen</h2>
