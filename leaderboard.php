@@ -34,6 +34,8 @@ session_start();
 
     <main>
         <h1>Topplista</h1>
+
+        <p>Om ditt namn inte visas i listan nedan, se till att du har fyllt i det i din <a href="https://distantrace.com/sv/konton/profil/" target="_blank" rel="noopener">profil här</a>.</p>
         
         <div class="leaderboard-container">
             <iframe
