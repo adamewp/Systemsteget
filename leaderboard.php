@@ -35,17 +35,8 @@ session_start();
     <main>
         <h1>Topplista</h1>
 
-        <p>Om ditt namn inte visas i listan nedan, se till att du har fyllt i det i din <a href="https://distantrace.com/sv/konton/profil/" target="_blank" rel="noopener">profil här</a>.</p>
+        <p>Vinnaren kommer att tillkännages inom kort.</p>
         
-        <div class="leaderboard-container">
-            <iframe
-                src="https://distantrace.com/en/challenges/fXmYWdzjFPHlgg/embedded/challengers/"
-                width="100%"
-                height="800px"
-                style="border: none; display: block;"
-                allowfullscreen>
-            </iframe>
-        </div>
     </main>
 
     <footer>
